@@ -28,7 +28,8 @@ An AI-powered Virtual Legal Assistant designed for a hackathon project. This web
 - Contextual retrieval using embeddings (optional)
 
 ## 📷 Screenshots
-_Add screenshots here if available._
+![image](https://github.com/user-attachments/assets/0cfbad70-4ce9-45e0-a688-b361d009f6a8)
+
 
 ## 📁 How to Run
 
