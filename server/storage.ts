@@ -50,24 +50,22 @@ export class MemStorage implements IStorage {
     // Get all messages, sort by timestamp descending, and limit to the requested number
     return Array.from(this.chatMessages.values())
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-      .slice(0, limit)
-      .map(message => ({
-        ...message,
-        // Ensure timestamp is the correct type
-        timestamp: message.timestamp instanceof Date ? message.timestamp : new Date(message.timestamp)
-      }));
+      .slice(0, limit);
   }
 
   async createChatMessage(insertMessage: InsertChatMessage): Promise<ChatMessage> {
     const id = this.chatMessageCurrentId++;
     const timestamp = new Date();
     
-    const message: ChatMessage = { 
-      ...insertMessage, 
-      id, 
+    // Create the chat message with the correct types
+    const message: ChatMessage = {
+      id,
+      question: insertMessage.question,
+      answer: insertMessage.answer,
       timestamp,
-      // Ensure tags is an array
-      tags: insertMessage.tags || []
+      // Optional fields - ensure they're either string/string[] or null, not undefined
+      citation: insertMessage.citation ?? null,
+      tags: insertMessage.tags ?? null
     };
     
     this.chatMessages.set(id, message);
