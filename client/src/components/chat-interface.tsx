@@ -8,6 +8,14 @@ import { useToast } from "@/hooks/use-toast";
 import ChatMessage from "@/components/chat-message";
 import { ChatMessage as ChatMessageType } from "@/types";
 
+// Add TypeScript support for Web Speech API
+// These types are not included in standard TypeScript libraries
+interface Window {
+  SpeechRecognition?: any;
+  webkitSpeechRecognition?: any;
+  speechRecognition?: any;
+}
+
 interface ChatInterfaceProps {
   messages: ChatMessageType[];
   setMessages: React.Dispatch<React.SetStateAction<ChatMessageType[]>>;
@@ -125,7 +133,7 @@ export default function ChatInterface({ messages, setMessages }: ChatInterfacePr
         let finalTranscript = '';
         
         // Handle results
-        recognition.onresult = (event: SpeechRecognitionEvent) => {
+        recognition.onresult = (event: any) => {
           let interimTranscript = '';
           
           // Collect results
@@ -180,7 +188,7 @@ export default function ChatInterface({ messages, setMessages }: ChatInterfacePr
         };
         
         // Handle errors
-        recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+        recognition.onerror = (event: any) => {
           console.error("Speech recognition error", event.error);
           setIsRecording(false);
           
@@ -272,10 +280,16 @@ export default function ChatInterface({ messages, setMessages }: ChatInterfacePr
           <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
             <Sparkles className="h-10 w-10 mb-3 text-blue-500" />
             <h3 className="text-lg font-medium mb-2">Welcome to DriveWise AI</h3>
-            <p className="max-w-md text-sm">
+            <p className="max-w-md text-sm mb-4">
               Ask me any questions about traffic rules, regulations, or driving scenarios.
               I'm here to help you understand the rules of the road!
             </p>
+            <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100 mt-2">
+              <Mic className="h-5 w-5 text-blue-500" />
+              <p className="text-sm text-blue-700">
+                <strong>New!</strong> You can now speak your questions using the microphone button
+              </p>
+            </div>
           </div>
         )}
         
