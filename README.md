@@ -5,9 +5,8 @@ An AI-powered Virtual Legal Assistant designed for a hackathon project. This web
 ## 🚀 Features
 
 - 💬 Chatbot interface for legal queries
-- 📄 Upload legal documents (PDF) and get summaries
 - 🛣️ Real-time traffic rule information
-- 🧠 AI-powered responses using GPT or Hugging Face models
+- 🧠 AI-powered responses using GPT 
 - 🌐 Easy-to-use web interface
 
 ## 🛠️ Tech Stack
