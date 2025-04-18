@@ -80,30 +80,135 @@ export default function ChatInterface({ messages, setMessages }: ChatInterfacePr
     setQuestion("");
   };
 
+  // Handle voice recording with the Web Speech API
   const toggleMicrophone = () => {
     if (isRecording) {
-      // Stop recording (in real app, you'd have actual recording logic here)
+      // Stop recording if already in progress
       setIsRecording(false);
+      
+      // If there's an active recognition instance, stop it
+      if (window.speechRecognition) {
+        window.speechRecognition.stop();
+        window.speechRecognition = null;
+      }
+      
       toast({
         title: "Voice recording stopped",
         description: "Voice input has been disabled.",
       });
     } else {
-      // Start recording (in real app, you'd have actual recording logic here)
-      setIsRecording(true);
-      toast({
-        title: "Voice recording started",
-        description: "Speak clearly to ask your question...",
-      });
-      
-      // Simulate ending the recording after 3 seconds
-      setTimeout(() => {
-        setIsRecording(false);
+      // Check if browser supports Speech Recognition
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
         toast({
-          title: "Voice recording completed",
-          description: "Processing your question...",
+          title: "Not supported",
+          description: "Voice recognition is not supported in your browser. Please try Chrome, Edge, or Safari.",
+          variant: "destructive",
         });
-      }, 3000);
+        return;
+      }
+      
+      // Start new recording
+      try {
+        // Initialize speech recognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        
+        // Configure recognition
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+        
+        // Store recognition instance globally to allow stopping
+        window.speechRecognition = recognition;
+        
+        // Set up event handlers
+        let finalTranscript = '';
+        
+        // Handle results
+        recognition.onresult = (event: SpeechRecognitionEvent) => {
+          let interimTranscript = '';
+          
+          // Collect results
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript;
+            } else {
+              interimTranscript += transcript;
+            }
+          }
+          
+          // Update the input field with current transcript
+          setQuestion(finalTranscript || interimTranscript);
+        };
+        
+        // Handle end of speech
+        recognition.onend = () => {
+          setIsRecording(false);
+          
+          // Submit the form if we have a final transcript
+          if (finalTranscript) {
+            toast({
+              title: "Voice processed",
+              description: "Your question: \"" + finalTranscript + "\"",
+            });
+            
+            setTimeout(() => {
+              // Add user message to chat
+              setMessages((prev) => [
+                ...prev,
+                {
+                  id: prev.length + 1,
+                  type: "user",
+                  content: finalTranscript,
+                  timestamp: new Date(),
+                },
+              ]);
+              
+              // Send to API
+              chatMutation.mutate(finalTranscript);
+              
+              // Clear input
+              setQuestion("");
+            }, 500);
+          } else {
+            toast({
+              title: "Voice recording completed",
+              description: "No speech detected. Please try again.",
+            });
+          }
+        };
+        
+        // Handle errors
+        recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+          console.error("Speech recognition error", event.error);
+          setIsRecording(false);
+          
+          toast({
+            title: "Voice recognition error",
+            description: "Error: " + event.error + ". Please try again.",
+            variant: "destructive",
+          });
+        };
+        
+        // Start recording
+        recognition.start();
+        setIsRecording(true);
+        
+        toast({
+          title: "Voice recording started",
+          description: "Speak clearly to ask your question...",
+        });
+      } catch (error) {
+        console.error("Error starting speech recognition:", error);
+        setIsRecording(false);
+        
+        toast({
+          title: "Voice recognition error",
+          description: "Could not start speech recognition. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -186,7 +291,7 @@ export default function ChatInterface({ messages, setMessages }: ChatInterfacePr
             type="button"
             variant="ghost"
             size="icon"
-            className={`mr-2 rounded-full p-2 ${isRecording ? 'bg-red-100 text-red-500 animate-pulse' : 'text-gray-500 hover:text-blue-600'}`}
+            className={`mr-2 p-2 ${isRecording ? 'recording-active' : 'text-gray-500 hover:text-blue-600'}`}
             onClick={toggleMicrophone}
           >
             {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
