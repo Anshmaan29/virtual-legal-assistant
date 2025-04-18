@@ -2,6 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { ChatMessage } from "@/types";
+import { Loader2, MapPin, Calendar, Info } from "lucide-react";
+import { useState } from "react";
 
 interface TrafficScenarioProps {
   image: string;
@@ -16,6 +18,8 @@ export default function TrafficScenario({
   description,
   setMessages
 }: TrafficScenarioProps) {
+  const [isHovering, setIsHovering] = useState(false);
+  
   const chatMutation = useMutation({
     mutationFn: async (question: string) => {
       const response = await apiRequest("POST", "/api/chat", { question });
@@ -49,27 +53,59 @@ export default function TrafficScenario({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="p-4 bg-secondary-500 text-white">
-        <h3 className="font-semibold">Scenario of the Day</h3>
+    <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 card-hover">
+      <div className="p-4 secondary-gradient text-white">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <MapPin className="h-5 w-5" />
+            <h3 className="font-semibold">Scenario of the Day</h3>
+          </div>
+          <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full flex items-center">
+            <Calendar className="h-3 w-3 mr-1" />
+            Today
+          </span>
+        </div>
       </div>
-      <div className="p-4">
-        <div className="mb-3">
+      
+      <div className="p-4 bg-gray-50">
+        <div className="mb-4 relative overflow-hidden rounded-lg" 
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+        >
           <img 
             src={image}
             alt="Traffic intersection with multiple lanes and traffic lights" 
-            className="w-full h-auto rounded-md"
+            className={`w-full h-auto rounded-lg transition-transform duration-500 ${isHovering ? 'scale-110' : 'scale-100'}`}
           />
+          
+          {/* Info overlay */}
+          <div className={`absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex items-end transition-opacity duration-300 ${isHovering ? 'opacity-100' : 'opacity-0'}`}>
+            <div className="p-4 text-white">
+              <div className="flex items-center text-sm mb-1">
+                <Info className="h-3.5 w-3.5 mr-1" />
+                <span>Scenario details</span>
+              </div>
+              <p className="text-xs text-white/80">Complex intersection with multiple turn lanes and traffic signals</p>
+            </div>
+          </div>
         </div>
-        <h4 className="font-medium text-neutral-800">{title}</h4>
-        <p className="text-sm text-neutral-600 mt-1">{description}</p>
+        
+        <h4 className="font-medium text-gray-800 text-lg gradient-text">{title}</h4>
+        <p className="text-sm text-gray-600 mt-2">{description}</p>
+        
         <Button
-          variant="outline"
-          className="mt-3 w-full bg-secondary-100 hover:bg-secondary-200 text-secondary-700 py-2 rounded-md text-sm font-medium transition duration-150"
+          className="mt-4 w-full py-2 animated-button primary-gradient text-white rounded-md text-sm font-medium"
           onClick={handleScenarioClick}
           disabled={chatMutation.isPending}
         >
-          Ask About This Scenario
+          {chatMutation.isPending ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            <>Ask About This Scenario</>
+          )}
         </Button>
       </div>
     </div>

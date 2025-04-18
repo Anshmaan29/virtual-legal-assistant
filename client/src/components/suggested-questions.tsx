@@ -1,6 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { ChatMessage } from "@/types";
+import { useState } from "react";
+import { Loader2, HelpCircle, Sparkles, ArrowRight } from "lucide-react";
 
 interface SuggestedQuestionsProps {
   questions: string[];
@@ -8,6 +10,8 @@ interface SuggestedQuestionsProps {
 }
 
 export default function SuggestedQuestions({ questions, setMessages }: SuggestedQuestionsProps) {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  
   const chatMutation = useMutation({
     mutationFn: async (question: string) => {
       const response = await apiRequest("POST", "/api/chat", { question });
@@ -38,25 +42,67 @@ export default function SuggestedQuestions({ questions, setMessages }: Suggested
   const handleQuestionClick = (question: string) => {
     chatMutation.mutate(question);
   };
+  
+  // Generate random colors for question buttons
+  const getQuestionColor = (index: number) => {
+    const colors = [
+      "from-blue-500 to-blue-700",
+      "from-indigo-500 to-indigo-700",
+      "from-purple-500 to-purple-700",
+      "from-blue-600 to-indigo-600",
+      "from-blue-500 to-purple-600"
+    ];
+    return colors[index % colors.length];
+  };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="p-4 bg-primary-500 text-white">
-        <h3 className="font-semibold">Suggested Questions</h3>
+    <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+      <div className="p-4 secondary-gradient text-white">
+        <div className="flex items-center space-x-2">
+          <Sparkles className="h-5 w-5" />
+          <h3 className="font-semibold">Suggested Questions</h3>
+        </div>
       </div>
-      <div className="p-4">
-        <ul className="space-y-2">
+      
+      <div className="p-4 bg-gray-50">
+        <ul className="space-y-3">
           {questions.map((question, index) => (
-            <li key={index}>
+            <li key={index} className="relative group card-hover">
               <button 
-                className="text-left w-full text-primary-700 hover:text-primary-900 flex items-center py-2 px-3 rounded-md hover:bg-primary-50"
+                className={`text-left w-full flex items-start py-3 px-4 rounded-lg border ${
+                  chatMutation.isPending && chatMutation.variables === question 
+                    ? "bg-indigo-50 border-indigo-200" 
+                    : "bg-white border-gray-200 hover:border-indigo-200"
+                }`}
                 onClick={() => handleQuestionClick(question)}
                 disabled={chatMutation.isPending}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {question}
+                <div className={`flex-shrink-0 p-1.5 rounded-full mr-3 bg-gradient-to-r ${getQuestionColor(index)}`}>
+                  <HelpCircle className="h-4 w-4 text-white" />
+                </div>
+                
+                <div className="flex-grow">
+                  <p className="text-gray-800 font-medium">
+                    {question}
+                  </p>
+                  
+                  {/* Status indicator when loading */}
+                  {chatMutation.isPending && chatMutation.variables === question && (
+                    <div className="mt-2 text-xs text-indigo-600 flex items-center">
+                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                      <span>Getting answer...</span>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Arrow that appears on hover */}
+                <div className={`absolute right-3 top-1/2 -translate-y-1/2 transform transition-all duration-300 ${
+                  hoveredIndex === index ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2"
+                }`}>
+                  <ArrowRight className="h-4 w-4 text-indigo-500" />
+                </div>
               </button>
             </li>
           ))}
