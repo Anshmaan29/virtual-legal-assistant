@@ -8,6 +8,41 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased bg-gray-50 text-foreground;
+  }
+}
+
+@layer components {
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 font-bold;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+  }
+  
+  .animated-button {
+    @apply relative overflow-hidden transition-all duration-300 hover:shadow-md active:translate-y-0.5;
+  }
+  
+  .animated-button::after {
+    content: '';
+    @apply absolute inset-0 bg-white opacity-0 transition-opacity duration-300;
+  }
+  
+  .animated-button:hover::after {
+    @apply opacity-20;
+  }
+  
+  .primary-gradient {
+    @apply bg-gradient-to-r from-blue-600 to-blue-800;
+  }
+  
+  .secondary-gradient {
+    @apply bg-gradient-to-r from-indigo-500 to-purple-600;
+  }
+  
+  .section-title {
+    @apply text-2xl font-bold mb-6 text-gray-800 border-l-4 pl-3 border-blue-500;
   }
 }
