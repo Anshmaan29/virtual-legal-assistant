@@ -55,7 +55,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "When must I yield to pedestrians?",
         "What are the rules for using a roundabout?",
         "When can I use the HOV lane?",
-        "What are the blood alcohol limits for drivers?"
+        "What are the blood alcohol limits for drivers?",
+        "What is the fine for riding without a helmet in India?",
+        "What should I do if I've been in a motorcycle accident?",
+        "What can I do if a traffic officer is asking for a bribe?",
+        "What are my rights if pulled over by police?",
+        "How do insurance claims work after a traffic accident?"
       ];
       
       res.json(suggestedQuestions);

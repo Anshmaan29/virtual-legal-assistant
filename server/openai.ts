@@ -84,6 +84,55 @@ function getFallbackResponse(question: string): ChatResponse | null {
     };
   }
   
+  // Helmet laws in India
+  if ((lowercaseQuestion.includes("helmet") || lowercaseQuestion.includes("without helmet")) && 
+      lowercaseQuestion.includes("india")) {
+    return {
+      answer: "In India, riding a two-wheeler without a helmet is an offense under the Motor Vehicles Act. As per the amended Motor Vehicles Act of 2019, the fine for riding without a helmet is Rs. 1,000 (previously Rs. 100) and can also lead to disqualification of license for 3 months. The exact amount may vary slightly from state to state as some states have modified the penalties. All riders, including pillion riders, are required to wear helmets that meet the Bureau of Indian Standards (BIS) certification.",
+      citation: "Motor Vehicles (Amendment) Act, 2019, Government of India",
+      tags: ["helmet law", "india", "traffic fine", "motorcycle safety"]
+    };
+  }
+  
+  // Motorcycle accident
+  if (lowercaseQuestion.includes("accident") && 
+     (lowercaseQuestion.includes("motorcycle") || lowercaseQuestion.includes("bike"))) {
+    return {
+      answer: "If you've been in a motorcycle accident: 1) Ensure your safety first by moving to a safe location if possible. 2) Call emergency services (police and ambulance) immediately. 3) Exchange information with all parties involved, including contact details, insurance information, and vehicle details. 4) Document the scene with photos and gather witness information if available. 5) Seek medical attention even if injuries seem minor. 6) Report the accident to your insurance company promptly. 7) Consult with a legal professional if there are disputes about liability or significant injuries. Do not admit fault at the scene, as determining liability requires a full investigation.",
+      citation: "National Highway Traffic Safety Administration Motorcycle Safety Guidelines",
+      tags: ["motorcycle accident", "emergency procedures", "traffic incident", "insurance claims"]
+    };
+  }
+  
+  // Traffic police bribery
+  if ((lowercaseQuestion.includes("police") || lowercaseQuestion.includes("officer") || lowercaseQuestion.includes("cop")) && 
+      (lowercaseQuestion.includes("bribe") || lowercaseQuestion.includes("bribery") || lowercaseQuestion.includes("corrupt"))) {
+    return {
+      answer: "If a traffic officer is requesting a bribe: 1) Remain calm and polite. 2) Ask for a proper citation or ticket for any alleged violation. 3) Request to see the officer's identification and make note of their name and badge number. 4) Inform them you wish to handle the matter through official channels. 5) If possible, record the interaction or ensure witnesses are present. 6) Report the incident to the police department's internal affairs division, local anti-corruption bureau, or equivalent oversight agency. Many countries have dedicated hotlines for reporting police corruption. Never offer or pay bribes as this is illegal and perpetuates corruption. Instead, follow legal procedures to contest any citation if you believe it was issued improperly.",
+      citation: "Transparency International Anti-Corruption Guidelines",
+      tags: ["police corruption", "traffic enforcement", "legal rights", "reporting procedure"]
+    };
+  }
+  
+  // Rights when pulled over
+  if (lowercaseQuestion.includes("rights") && 
+     (lowercaseQuestion.includes("pulled over") || lowercaseQuestion.includes("stopped by police"))) {
+    return {
+      answer: "When pulled over by police, you generally have these rights: 1) The right to remain silent beyond providing license, registration, and insurance when requested. 2) The right to refuse searches of your vehicle (though police may have other grounds to search). 3) The right to record the interaction (but inform the officer you're recording). 4) The right to ask if you're free to leave. 5) The right to sign a ticket without admitting guilt. You should: remain calm, keep hands visible, follow instructions, and be polite but firm about your rights. Avoid sudden movements, arguing, or fleeing, which can escalate the situation. Remember that rights vary by country and jurisdiction, so familiarize yourself with local laws.",
+      citation: "American Civil Liberties Union (ACLU) Know Your Rights Guidelines",
+      tags: ["legal rights", "traffic stop", "police interaction", "driver responsibilities"]
+    };
+  }
+  
+  // Insurance claims after accident
+  if (lowercaseQuestion.includes("insurance") && lowercaseQuestion.includes("accident")) {
+    return {
+      answer: "After a traffic accident, follow these steps for insurance claims: 1) Report the accident to your insurance company immediately, regardless of fault. 2) Provide all requested documentation, including police reports, photos of damages, medical reports, and repair estimates. 3) Be truthful and consistent in all statements. 4) Keep detailed records of all communication with insurance companies. 5) Understand your policy coverage before accepting settlements. 6) If the other party was at fault, their insurance should cover your damages, but your insurance company can help with this process. 7) Consider consulting an attorney for serious accidents or if the insurance company denies your claim. The claim process typically takes 2-6 weeks for property damage and potentially longer for injury claims.",
+      citation: "Insurance Information Institute Guidelines",
+      tags: ["insurance claims", "accident procedure", "vehicle damage", "policyholder rights"]
+    };
+  }
+  
   // Return null if no matching question was found
   return null;
 }
@@ -161,8 +210,8 @@ export async function generateChatResponse(question: string): Promise<ChatRespon
   
   // For questions we don't have fallbacks for
   return {
-    answer: "I don't have specific information about that topic yet. Please try asking about school buses, pedestrian right of way, roundabouts, HOV lanes, or blood alcohol limits for drivers.",
+    answer: "I don't have specific information about that topic yet. Please try asking about: school buses, pedestrian right of way, roundabouts, HOV lanes, blood alcohol limits, helmet laws in India, motorcycle accidents, traffic police interactions, your rights when pulled over, or insurance claims after an accident.",
     citation: "DriveWise AI Knowledge Base",
-    tags: ["information", "driving rules"]
+    tags: ["information", "driving rules", "traffic regulations"]
   };
 }
