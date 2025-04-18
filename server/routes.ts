@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { generateChatResponse } from "./openai";
+import { generateGeminiResponse } from "./gemini";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -24,8 +24,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { question } = schema.parse(req.body);
       
-      // Generate AI response
-      const aiResponse = await generateChatResponse(question);
+      // Generate AI response using Gemini
+      const aiResponse = await generateGeminiResponse(question);
       
       // Store the message and response
       const storedMessage = await storage.createChatMessage({
